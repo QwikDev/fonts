@@ -4,6 +4,7 @@ import { transform } from "esbuild";
 import type { TransformOptions } from "esbuild";
 import { transformCSS } from "../css/transformer";
 import { providers } from "unifont";
+import local from "../providers/local";
 
 const defaultModule = {
   devtools: true,
@@ -22,7 +23,7 @@ const defaultModule = {
   },
   providers: {
     // should import with Jiti
-    // local, //TODO
+    local,
     adobe: providers.adobe,
     google: providers.google,
     googleicons: providers.googleicons,

@@ -19,7 +19,10 @@ export default component$(() => {
       <p class="font-share-panchang">Panchang</p>
 
       <h1>FontSource</h1>
-      <p class="font-source-luckiest">Lobster</p>
+      <p class="font-source-luckiest">Luckiest</p>
+
+      <h1>Local</h1>
+      <p class="local">Local font</p>
     </div>
   );
 });

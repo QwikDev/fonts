@@ -10,14 +10,6 @@ p {
   font-family: "Press Start 2P", sans-serif;
 }
 
-.adobe-limon {
-  font-family: "Limon Script Regular", sans-serif;
-}
-
-.adobe-angkor {
-  font-family: "Angkor", sans-serif;
-}
-
 .bunny-aclonica {
   font-family: "Aclonica", sans-serif;
 }
@@ -32,4 +24,13 @@ p {
 
 .font-source-luckiest {
   font-family: "Luckiest Guy", sans-serif;
+}
+
+@font-face {
+  font-family: "Black Fox";
+  src: url("./black-fox.ttf");
+}
+
+.local {
+  font-family: "Black Fox", sans-serif;
 }

@@ -1,13 +1,13 @@
 import { transform } from "esbuild";
+import { createJiti } from "jiti";
 import MagicString from "magic-string";
 import { parse, walk } from "css-tree";
 import { dirname, extname } from "pathe";
-import { hasProtocol, joinURL, withLeadingSlash } from "ufo";
+import { hasProtocol, withLeadingSlash } from "ufo";
 import {
   createUnifont,
   FontFaceData,
   Provider,
-  providers,
   RemoteFontSource,
 } from "unifont";
 import {
@@ -24,7 +24,6 @@ import {
   parseFont,
   relativiseFontSources,
 } from "./render";
-import type { CssNode, StyleSheet } from "css-tree";
 import { hash } from "ohash";
 import { filename } from "pathe/utils";
 import {
@@ -110,7 +109,7 @@ async function defaultResolveFontFace(
             "url" in source &&
             hasProtocol(source.url, { acceptRelative: true })
           ) {
-            // source.url =  source.url.replace(/^\/\//, "https://"); //TODO: Review this if it's necessary?
+            source.url = source.url.replace(/^\/\//, "https://");
             const file = [
               // TODO: investigate why negative ignore pattern below is being ignored
               filename(source.url.replace(/\?.*/, "")).replace(/^-+/, ""),
@@ -185,6 +184,7 @@ async function defaultResolveFontFace(
       }
     }
 
+    const providers = await resolveProviders(module.providers);
     const prioritisedProviders = new Set<string>();
     const resolvedProviders: Array<Provider> = [];
     for (const [key, provider] of Object.entries(providers)) {
@@ -337,7 +337,6 @@ export async function transformCSS(
           injectedDeclarations.add(declaration);
           if (!fontless.dev) {
             declaration = await transform(declaration, {
-              loader: "css",
               charset: "utf8",
               minify: true,
               ...postcssOptions,
@@ -435,4 +434,23 @@ export async function transformCSS(
   await Promise.all(promises);
 
   return s;
+}
+
+async function resolveProviders(_providers: ModuleOptions["providers"] = {}) {
+  const jiti = createJiti("/");
+
+  const providers = { ..._providers };
+  for (const key in providers) {
+    const value = providers[key];
+    if (value === false) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete providers[key];
+    }
+    if (typeof value === "string") {
+      providers[key] = await jiti.import(value, {
+        default: true,
+      });
+    }
+  }
+  return providers as Record<string, (options: any) => Provider>;
 }
